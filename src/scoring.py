@@ -59,3 +59,31 @@ def big_five(df: pd.DataFrame) -> pd.DataFrame:
 def build_targets_and_features(df: pd.DataFrame) -> pd.DataFrame:
     """Tiện ích: chạy cả 3 bước scoring trên một DataFrame đã làm sạch."""
     return big_five(dass_severity(dass_scores(df)))
+
+
+# ---------------------------------------------------------------------------
+# Dựng biến mục tiêu theo TASK_MODE
+# ---------------------------------------------------------------------------
+def make_target(df: pd.DataFrame, target: str, mode: str):
+    """
+    Trả về (y, labels, kind):
+      - mode "multiclass": y = mã 0..k của severity; labels = tên mức; kind="clf"
+      - mode "binary":     y = 0/1 nguy cơ cao;      labels = BINARY_LABELS; kind="clf"
+      - mode "regression": y = điểm 0..42 (float);   labels = None;          kind="reg"
+    """
+    if mode == "multiclass":
+        y_str = df[f"{target}_level"]
+        order = C.SEVERITY_ORDER[:] if not C.COLLAPSE_SEVERE else \
+            [l for l in C.SEVERITY_ORDER if l != "Extremely Severe"]
+        labels = [l for l in order if l in set(y_str)]
+        code = {lab: i for i, lab in enumerate(labels)}
+        return y_str.map(code).astype(int), labels, "clf"
+
+    if mode == "binary":
+        y = (df[f"{target}_score"] >= C.HIGH_RISK_CUTOFF[target]).astype(int)
+        return y, C.BINARY_LABELS, "clf"
+
+    if mode == "regression":
+        return df[f"{target}_score"].astype(float), None, "reg"
+
+    raise ValueError(f"TASK_MODE không hợp lệ: {mode!r}")

@@ -54,6 +54,21 @@ SEVERITY_ORDER = ["Normal", "Mild", "Moderate", "Severe", "Extremely Severe"]
 COLLAPSE_SEVERE = False
 
 # ---------------------------------------------------------------------------
+# Chế độ bài toán  ( đổi 1 dòng -> đổi toàn pipeline )
+#   "multiclass"  : phân loại 5 mức severity (Normal..Extremely Severe)
+#   "binary"      : phân loại nhị phân "nguy cơ cao" (Moderate trở lên)  <- AUC ~0.81
+#   "regression"  : hồi quy điểm DASS liên tục 0..42
+# ---------------------------------------------------------------------------
+TASK_MODE = "binary"
+
+# Ngưỡng "nguy cơ cao" = cận dưới của mức Moderate, suy ra từ SEVERITY_CUTOFFS.
+HIGH_RISK_CUTOFF = {
+    name: next(lo for lab, lo, hi in cuts if lab == "Moderate")
+    for name, cuts in SEVERITY_CUTOFFS.items()
+}  # -> {'depression': 14, 'anxiety': 10, 'stress': 19}
+BINARY_LABELS = ["Không/Nhẹ", "Nguy cơ cao"]  # 0, 1
+
+# ---------------------------------------------------------------------------
 # TIPI (Big Five rút gọn, thang 1..7). 0 = thiếu.
 # Quy tắc tính điểm Gosling et al. (2003): mỗi chiều = trung bình của
 # (item thuận, item đảo). Item đảo được reverse: 8 - score.

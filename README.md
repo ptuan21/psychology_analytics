@@ -201,11 +201,14 @@ Tách **train 60% / valid 20% / test 20%** (chống rò rỉ): tinh chỉnh siê
 Dùng `TreeExplainer` (XGBoost) để mở "hộp đen" — biết **vì sao** mô hình gắn cờ một người:
 
 - **Toàn cục** (`shap_bar.png`, `shap_beeswarm.png`): sức khỏe tự đánh giá, giấc ngủ,
-  thu nhập, tuổi, hút thuốc là các yếu tố đẩy dự đoán nhiều nhất — khớp với hồi quy OR.
-- **Cục bộ** (`shap_case_high*.png`): waterfall cho từng cá nhân. Ví dụ một ca P=0.98
-  được gắn cờ chủ yếu do **sức khỏe kém (+1.35)**, **ngủ ~2h (+0.78)**, thu nhập thấp,
-  hút thuốc — mỗi quyết định đều truy vết được, tăng độ tin cậy & tính minh bạch.
-- **Dependence** (`shap_dependence.png`): tác động của yếu tố mạnh nhất biến thiên theo giá trị.
+  **việc làm**, **an ninh lương thực**, thu nhập là các yếu tố đẩy dự đoán nhiều nhất.
+  Trong nhóm xã hội: việc làm (|SHAP| 0.31, hạng 7/35) & an ninh lương thực (0.24, hạng 5)
+  mạnh; bảo hiểm yếu (hạng 25).
+- **Cục bộ** (`shap_case_food*.png`): waterfall từng cá nhân. Ví dụ ca P=0.98 (thiếu đói)
+  được gắn cờ do **sức khỏe kém (+1.25)**, **ngủ ~4h (+0.93)**, **an ninh lương thực thiếu (+0.51)**,
+  **thất nghiệp (+0.22)** — yếu tố xã hội đẩy rủi ro rõ rệt ở mức cá nhân.
+- **Dependence** (`shap_dependence.png`, `shap_dependence_food.png`): tác động biến thiên
+  theo giá trị (vd an ninh lương thực càng thiếu → đẩy nguy cơ càng cao).
 
 → Mô hình không dựa vào tín hiệu giả; lý do gắn cờ là các yếu tố nguy cơ có ý nghĩa lâm sàng.
 

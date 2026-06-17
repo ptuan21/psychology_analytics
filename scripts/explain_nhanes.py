@@ -75,23 +75,46 @@ def main():
     plt.title("SHAP beeswarm — chiều & độ lớn tác động theo từng người")
     _save("shap_beeswarm.png")
 
-    # yếu tố quan trọng nhất -> dependence plot
-    top = names[int(np.argmax(np.abs(exp.values).mean(0)))]
+    # ---- TIÊU ĐIỂM yếu tố XÃ HỘI: an ninh lương thực / việc làm / bảo hiểm ----
+    mean_abs = np.abs(exp.values).mean(0)
+    rank = {n: r for r, n in enumerate(np.array(names)[np.argsort(mean_abs)[::-1]], 1)}
+    # gom các cột one-hot về 3 yếu tố xã hội
+    groups = {"food_security": ["food_security"],
+              "employment": [n for n in names if n.startswith("employment")],
+              "insured": [n for n in names if n.startswith("insured")]}
+    print("Tầm quan trọng (mean |SHAP|) của yếu tố xã hội:")
+    for g, cols in groups.items():
+        imp = sum(mean_abs[names.index(c)] for c in cols)
+        best_rank = min(rank[c] for c in cols)
+        print(f"  {g:<14} |SHAP|={imp:.4f}  (hạng cao nhất {best_rank}/{len(names)})")
+
+    # dependence cho an ninh lương thực (1=Full ... 4=Very low)
+    shap.plots.scatter(exp[:, "food_security"], show=False)
+    plt.title("SHAP dependence — an ninh lương thực (1=đủ ăn → 4=rất thiếu)")
+    _save("shap_dependence_food.png")
+    # dependence cho yếu tố mạnh nhất tổng thể
+    top = names[int(np.argmax(mean_abs))]
     shap.plots.scatter(exp[:, top], show=False)
     plt.title(f"SHAP dependence — {top}")
     _save("shap_dependence.png")
 
-    # ---- cục bộ: 2 ca bị gắn cờ rủi ro cao nhất ----
+    # ---- cục bộ: chọn ca rủi ro cao & THIẾU ĐÓI để thấy yếu tố xã hội đẩy dự đoán ----
     proba = model.predict_proba(df_te)[:, 1]
     order = np.argsort(proba)[::-1]
+    food = Xte["food_security"].values
+    sc = lambda i, cols: sum(exp.values[i, names.index(c)] for c in cols)  # SHAP gộp nhóm
     feat_cols = nm.NUMERIC + nm.CATEGORICAL
-    for k, idx in enumerate(order[:2], 1):
+    insecure = [i for i in order if food[i] in (3, 4)][:2]
+    for k, idx in enumerate(insecure, 1):
         row = Xte.iloc[idx]
-        print(f"Ca rủi ro cao #{k}: xác suất={proba[idx]:.2f} | "
+        print(f"\nCa rủi ro cao + thiếu đói #{k}: P={proba[idx]:.2f} | "
               + ", ".join(f"{c}={row[c]}" for c in feat_cols if pd.notna(row[c])))
+        print(f"   SHAP xã hội: lương_thực={sc(idx, groups['food_security']):+.2f}  "
+              f"việc_làm={sc(idx, groups['employment']):+.2f}  "
+              f"bảo_hiểm={sc(idx, groups['insured']):+.2f}")
         shap.plots.waterfall(exp[idx], max_display=12, show=False)
-        plt.title(f"Vì sao gắn cờ — ca #{k} (P={proba[idx]:.2f})")
-        _save(f"shap_case_high{k}.png")
+        plt.title(f"Vì sao gắn cờ — ca thiếu đói #{k} (P={proba[idx]:.2f})")
+        _save(f"shap_case_food{k}.png")
 
 
 if __name__ == "__main__":

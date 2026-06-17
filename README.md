@@ -252,6 +252,32 @@ việc làm (OCQ), bảo hiểm y tế (HIQ). Sau đó đo sức mạnh dự đo
 **Ensemble (stacking LogReg+RF+XGB):** AUC **0.801 → 0.821**. Đầu ra:
 `factor_domain_standalone.png`, `factor_domain_incremental.png`, `factor_domains.csv`.
 
+### Độ tin cậy & Công bằng (`scripts/fairness_nhanes.py`)
+
+**(#2) Cross-validation 5-fold** — thay vì 1 lần chia:
+
+| | AUC |
+|---|:---:|
+| Thường | **0.800 ± 0.007** |
+| Có trọng số (đại diện dân số) | **0.805 ± 0.010** |
+
+→ Kết quả **ổn định** (std nhỏ), weighted ≈ unweighted → khái quát được ra dân số.
+
+**(#1) Kiểm toán công bằng** — mô hình **KHÔNG đều** giữa các nhóm (phát hiện quan trọng):
+
+| Biến | ΔAUC | Δ Độ nhạy | Δ Tỉ lệ gắn cờ |
+|------|:---:|:---:|:---:|
+| **Thu nhập** | 0.073 | **0.376** | **0.467** |
+| Nhóm tuổi | 0.107 | 0.180 | 0.123 |
+| Chủng tộc | 0.049 | 0.203 | 0.210 |
+| Giới | 0.014 | 0.096 | 0.220 |
+
+- **Thu nhập = bất bình đẳng lớn nhất:** người **nghèo bị gắn cờ 66%** (FPR 0.61, calibration kém Brier 0.121)
+  vs người **khá chỉ 20%** (FPR 0.18). Một ngưỡng chung "phạt" người thu nhập thấp bằng nhiều báo động giả.
+- **Tuổi:** model phân biệt tốt nhất ở 36–50 (AUC 0.86), **kém nhất ở 18–35** (~0.76) — đáng lưu ý vì giới trẻ là nhóm trọng tâm.
+- **Chủng tộc:** nhóm Other/Multi độ nhạy thấp (0.69 — bỏ sót nhiều ca hơn).
+- → **Hàm ý:** nên **ngưỡng/hiệu chỉnh riêng theo nhóm**, không dùng một ngưỡng chung máy móc; báo cáo công bằng cùng độ chính xác.
+
 ## 🖼️ Thư viện kết quả (biểu đồ)
 
 **Xu hướng trầm cảm theo thời gian × tuổi × bậc học** (NHANES, có trọng số)
@@ -283,6 +309,10 @@ Ngủ <6h (OR 2.53), sức khỏe kém (2.23), nữ (1.80), hút thuốc (1.68).
 | Toàn cục (beeswarm) | Một ca cụ thể (waterfall) |
 |---|---|
 | ![](outputs/figures/nhanes/shap_beeswarm.png) | ![](outputs/figures/nhanes/shap_case_food1.png) |
+
+**Kiểm toán công bằng** — chênh lệch độ nhạy/FPR/tỉ lệ gắn cờ giữa các nhóm (thu nhập lệch nhiều nhất)
+
+![Fairness theo nhóm](outputs/figures/nhanes/fairness_threshold.png)
 
 ## Giới hạn (trung thực)
 

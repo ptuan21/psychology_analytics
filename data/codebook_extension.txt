@@ -1,0 +1,105 @@
+EXTENSION CODEBOOK — additional variables to collect (v1)
+=========================================================
+
+Purpose: extend the existing DASS dataset (cross-sectional, English/global) with
+three blocks that the current data lacks:
+  A. CLINICAL ground-truth labels (small validation subset)
+  B. FUNCTIONING & SAFETY
+  C. MODIFIABLE risk / protective factors
+
+Design rules (keep new data compatible with the existing pipeline):
+  - Same file format: one row per respondent, TAB-separated, header row.
+  - Append these columns AFTER the existing ones; keep existing column names intact.
+  - Missing / not-applicable = 0 (same convention as the original codebook),
+    EXCEPT numeric free-entry fields where missing = empty cell.
+  - All scales below are public-domain or free-to-use for research.
+
+-----------------------------------------------------------------
+BLOCK A — CLINICAL GROUND TRUTH   (collect ONLY for a clinician-assessed subset)
+-----------------------------------------------------------------
+Most respondents will have 0 here. A few hundred assessed by a clinician are
+enough to validate the screening tool (sensitivity / specificity / calibration).
+
+clin_assessed   Was this respondent assessed by a clinician? 1=Yes, 0=No
+clin_method     Assessment method, 1=MINI, 2=SCID-5, 3=Unstructured clinical interview, 0=NA
+clin_mdd        Meets criteria for a current depressive disorder, 1=Yes, 0=No (blank if not assessed)
+clin_anx        Meets criteria for any current anxiety disorder, 1=Yes, 0=No (blank if not assessed)
+clin_cgi_s      Clinical Global Impression – Severity, 1=Normal ... 7=Among the most extremely ill, 0=NA
+
+-----------------------------------------------------------------
+BLOCK B — FUNCTIONING & SAFETY
+-----------------------------------------------------------------
+# Functioning — Sheehan Disability Scale (SDS). "How much have your symptoms
+# disrupted the following?" 0=Not at all ... 10=Extremely.
+SDS_work        Disruption to work / school (0–10)
+SDS_social      Disruption to social life / leisure (0–10)
+SDS_family      Disruption to family life / home responsibilities (0–10)
+SDS_days_lost   Days in the PAST WEEK unable to work / study (0–7)
+SDS_days_unprod Days in the PAST WEEK underproductive (0–7)
+
+# Safety — Columbia (C-SSRS) screener. Past MONTH unless stated. 1=Yes, 0=No.
+# *** Any "Yes" MUST trigger immediate on-screen crisis resources (see SAFETY PROTOCOL). ***
+cssrs_wish_dead Wished you were dead or could go to sleep and not wake up? (1/0)
+cssrs_thoughts  Had any actual thoughts of killing yourself? (1/0)
+cssrs_method    Thought about HOW you might do this? (1/0)
+cssrs_intent    Had some intention of acting on these thoughts? (1/0)
+cssrs_behavior  LIFETIME: ever done anything / started to do anything to end your life? (1/0)
+
+-----------------------------------------------------------------
+BLOCK C — MODIFIABLE RISK / PROTECTIVE FACTORS
+-----------------------------------------------------------------
+# Sleep
+sleep_hours     Average hours of sleep per night (numeric, e.g. 6.5)
+sleep_quality   Overall sleep quality, 1=Very poor, 2=Poor, 3=Fair, 4=Good, 5=Very good
+
+# Physical activity
+phys_days       Days per week with >=30 min of moderate activity (0–7)
+
+# Loneliness — UCLA 3-item. "How often do you feel...". 1=Hardly ever, 2=Some of the time, 3=Often
+ucla_companion  ...that you lack companionship?
+ucla_leftout    ...left out?
+ucla_isolated   ...isolated from others?
+
+# Screen / social media
+screen_hours    Hours per day of recreational screen / social-media use (numeric)
+
+# Alcohol — AUDIT-C. Each item 0–4 (standard AUDIT-C coding).
+auditc_freq     How often do you have a drink containing alcohol? 0=Never ... 4=4+ times/week
+auditc_amount   Drinks on a typical drinking day? 0=1–2 ... 4=10+
+auditc_binge    How often 6+ drinks on one occasion? 0=Never ... 4=Daily/almost daily
+
+# Other substances
+smoke           Smoking status, 0=Never, 1=Former, 2=Current
+caffeine        Caffeinated drinks per day (numeric)
+
+# Context / stressors
+fin_stress      Financial stress right now, 1=None ... 5=Severe
+employment      1=Student, 2=Employed full-time, 3=Employed part-time, 4=Unemployed,
+                5=Unable to work, 6=Retired, 7=Other, 0=NA
+life_events_6mo Number of major stressful life events in the past 6 months (count, 0–n)
+                (e.g. bereavement, job loss, breakup, illness, financial shock, abuse)
+chronic_illness Has a diagnosed chronic physical illness? 1=Yes, 0=No
+
+# Help-seeking
+help_current    Currently receiving any mental-health support? 1=Yes, 0=No
+help_type       1=Talk therapy, 2=Medication, 3=Both, 4=Self-help / app, 0=None
+help_barrier    Main barrier to seeking help, 1=Cost, 2=Stigma, 3=Access/availability,
+                4=Don't think I need it, 5=Time, 6=Other, 0=None/NA
+
+-----------------------------------------------------------------
+DERIVED SCORES (computed by src/ingest.py — do NOT collect directly)
+-----------------------------------------------------------------
+ucla_total      = ucla_companion + ucla_leftout + ucla_isolated   (3–9; >=6 = lonely)
+auditc_total    = auditc_freq + auditc_amount + auditc_binge      (0–12; risky: >=4 male / >=3 female)
+sds_total       = SDS_work + SDS_social + SDS_family              (0–30; >=5 on any item = impaired)
+safety_flag     = 1 if ANY cssrs_* item == 1 else 0               (triggers crisis-resource display)
+
+-----------------------------------------------------------------
+SAFETY PROTOCOL  (mandatory — mental-health data is sensitive)
+-----------------------------------------------------------------
+1. Informed consent + ethics/IRB approval before any collection.
+2. If safety_flag triggers during the survey, IMMEDIATELY display local crisis
+   hotline(s) and encourage contacting emergency services. Do not gate this behind
+   survey completion.
+3. Store no direct identifiers. Use a random anonymous ID. Encrypt at rest.
+4. Provide a clear statement: this is a SCREENING / research tool, NOT a diagnosis.

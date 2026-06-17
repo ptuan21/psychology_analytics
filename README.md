@@ -117,7 +117,59 @@ extraversion, conscientiousness, tuổi.
 - Thêm `country` (gom top-N), `testelapse`, thời gian trả lời từng câu (`QnE`).
 - Tinh chỉnh siêu tham số (Optuna / GridSearch) + hiệu chỉnh xác suất (calibration).
 
+---
+
+# Phần mở rộng: Phân tích xu hướng trầm cảm thật (NHANES 2007–2023)
+
+Ngoài dữ liệu DASS, dự án bổ sung **dữ liệu thật, đại diện dân số** từ **NHANES**
+(CDC, Mỹ) để phân tích **xu hướng trầm cảm theo thời gian × tuổi × bậc học × nhiều yếu tố**
+trong kỷ nguyên smartphone (2007 → nay), và định lượng yếu tố can thiệp được.
+
+- **Nguồn:** 7 chu kỳ NHANES 2007–2023, tải trực tiếp từ CDC (công khai).
+- **Quy mô:** 71.775 người (~37k có PHQ-9 hợp lệ); đo trầm cảm bằng **PHQ-9**.
+- **Biến:** nhân khẩu (tuổi, giới, học vấn, chủng tộc, thu nhập, hôn nhân) +
+  yếu tố can thiệp được (ngủ, rượu, vận động, ít vận động, hút thuốc, sức khỏe tự đánh giá).
+- Mọi ước lượng **dùng trọng số khảo sát** (đại diện dân số).
+
+## Quy trình (tái lập đầy đủ)
+
+```bash
+bash   scripts/fetch_nhanes.sh           # tải .xpt thật từ CDC -> data/nhanes/raw/
+python scripts/build_nhanes.py           # hài hoà 7 chu kỳ -> data/nhanes/nhanes_pooled.csv
+python scripts/analyze_nhanes_trends.py  # 6 biểu đồ xu hướng theo tuổi/bậc học/thời gian
+python scripts/analyze_nhanes_factors.py # 4 biểu đồ theo giới/chủng tộc/thu nhập/...
+python scripts/model_nhanes.py           # hồi quy logistic đa biến -> Odds Ratio
+```
+
+| File | Vai trò |
+|------|---------|
+| `src/nhanes.py` | logic hài hoà biến + tiện ích ước lượng có trọng số |
+| `scripts/fetch_nhanes.sh` | tải dữ liệu thật |
+| `scripts/build_nhanes.py` | dựng bảng gộp |
+| `scripts/analyze_nhanes_trends.py` | xu hướng tuổi × bậc học × thời gian |
+| `scripts/analyze_nhanes_factors.py` | mở rộng nhiều yếu tố |
+| `scripts/model_nhanes.py` | hồi quy đa biến + kiểm định tương tác |
+
+## Phát hiện chính (dữ liệu thật, có trọng số)
+
+- **Tỉ lệ trầm cảm tăng** từ ~8% (2007–2018) lên **12.6% (2021–2023)**.
+- **Tập trung ở người trẻ:** nhóm 18–25 từ ~7% → **19.8%**; mô hình tương tác xác nhận
+  nguy cơ tăng **nhanh gấp 2.2×/thập kỷ** so với nhóm 36–50 (p≈5×10⁻⁷).
+- **Yếu tố độc lập mạnh nhất (OR đã hiệu chỉnh):** ngủ <6h (2.53), sức khỏe kém (2.23),
+  nữ giới (1.80), đang hút thuốc (1.68), ly hôn/goá (1.59). Thu nhập cao & tuổi ≥66 bảo vệ.
+- → Đòn bẩy hỗ trợ: **giấc ngủ, cai thuốc, vận động, kết nối xã hội**, ưu tiên **giới trẻ**.
+
+## Giới hạn (trung thực)
+
+- **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.
+- Trọng số cho ước lượng đại diện, nhưng **khoảng tin cậy OR là xấp xỉ** (chưa mô hình hoá
+  đầy đủ thiết kế chọn mẫu phức tạp). Học vấn chỉ hỏi người ≥20; thiếu 2019–2020 (COVID).
+- File `.xpt` thô bị `.gitignore` (tải lại bằng `fetch_nhanes.sh`); giữ `nhanes_pooled.csv`.
+
+---
+
 ## Lưu ý đạo đức
 
-Đây là dữ liệu khảo sát tự nguyện ẩn danh dùng cho mục đích học tập. Mô hình **không**
+Đây là dữ liệu khảo sát ẩn danh dùng cho mục đích học tập. Các mô hình **không**
 là công cụ chẩn đoán y tế và không nên dùng để ra quyết định về cá nhân thực.
+Xem thêm `data/codebook_extension.txt` (quy trình thu thập + an toàn) nếu mở rộng thu dữ liệu mới.

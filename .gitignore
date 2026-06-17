@@ -13,3 +13,7 @@ env/
 .DS_Store
 .vscode/
 .idea/
+
+# NHANES file thô .xpt (tải lại bằng scripts/fetch_nhanes.sh)
+data/nhanes/raw/
+*.xpt

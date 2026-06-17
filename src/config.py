@@ -100,3 +100,37 @@ CATEGORICAL_FEATURES = [
     "education", "urban", "gender", "engnat", "religion",
     "orientation", "race", "voted", "married", "hand", "screensize",
 ]
+
+# ---------------------------------------------------------------------------
+# CỘT MỞ RỘNG (thu thập thêm) — xem data/codebook_extension.txt
+# Dùng cho src/ingest.py khi nhập dữ liệu mới. Chưa có trong data.csv hiện tại.
+# ---------------------------------------------------------------------------
+EXT_CLINICAL = ["clin_assessed", "clin_method", "clin_mdd", "clin_anx", "clin_cgi_s"]
+EXT_FUNCTION = ["SDS_work", "SDS_social", "SDS_family", "SDS_days_lost", "SDS_days_unprod"]
+EXT_SAFETY = ["cssrs_wish_dead", "cssrs_thoughts", "cssrs_method", "cssrs_intent", "cssrs_behavior"]
+EXT_MODIFIABLE = [
+    "sleep_hours", "sleep_quality", "phys_days",
+    "ucla_companion", "ucla_leftout", "ucla_isolated", "screen_hours",
+    "auditc_freq", "auditc_amount", "auditc_binge", "smoke", "caffeine",
+    "fin_stress", "employment", "life_events_6mo", "chronic_illness",
+    "help_current", "help_type", "help_barrier",
+]
+EXT_COLUMNS = EXT_CLINICAL + EXT_FUNCTION + EXT_SAFETY + EXT_MODIFIABLE
+
+# Khoảng giá trị hợp lệ để xác thực dữ liệu thu thập (min, max). None = tự do.
+EXT_RANGES = {
+    "clin_assessed": (0, 1), "clin_method": (0, 3), "clin_mdd": (0, 1),
+    "clin_anx": (0, 1), "clin_cgi_s": (0, 7),
+    "SDS_work": (0, 10), "SDS_social": (0, 10), "SDS_family": (0, 10),
+    "SDS_days_lost": (0, 7), "SDS_days_unprod": (0, 7),
+    "cssrs_wish_dead": (0, 1), "cssrs_thoughts": (0, 1), "cssrs_method": (0, 1),
+    "cssrs_intent": (0, 1), "cssrs_behavior": (0, 1),
+    "sleep_hours": (0, 24), "sleep_quality": (1, 5), "phys_days": (0, 7),
+    "ucla_companion": (1, 3), "ucla_leftout": (1, 3), "ucla_isolated": (1, 3),
+    "screen_hours": (0, 24),
+    "auditc_freq": (0, 4), "auditc_amount": (0, 4), "auditc_binge": (0, 4),
+    "smoke": (0, 2), "caffeine": (0, None),
+    "fin_stress": (1, 5), "employment": (0, 7), "life_events_6mo": (0, None),
+    "chronic_illness": (0, 1), "help_current": (0, 1),
+    "help_type": (0, 4), "help_barrier": (0, 6),
+}

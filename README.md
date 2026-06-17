@@ -195,6 +195,19 @@ Tách **train 60% / valid 20% / test 20%** (chống rò rỉ): tinh chỉnh siê
 đổi lại cần theo dõi ~40% số người. Đây là đánh đổi đặc trưng của công cụ sàng lọc.
 Đầu ra: `calibration_nhanes.png`, `threshold_nhanes.png`, `nhanes_thresholds.csv`.
 
+### Giải thích mô hình bằng SHAP (`scripts/explain_nhanes.py`)
+
+Dùng `TreeExplainer` (XGBoost) để mở "hộp đen" — biết **vì sao** mô hình gắn cờ một người:
+
+- **Toàn cục** (`shap_bar.png`, `shap_beeswarm.png`): sức khỏe tự đánh giá, giấc ngủ,
+  thu nhập, tuổi, hút thuốc là các yếu tố đẩy dự đoán nhiều nhất — khớp với hồi quy OR.
+- **Cục bộ** (`shap_case_high*.png`): waterfall cho từng cá nhân. Ví dụ một ca P=0.98
+  được gắn cờ chủ yếu do **sức khỏe kém (+1.35)**, **ngủ ~2h (+0.78)**, thu nhập thấp,
+  hút thuốc — mỗi quyết định đều truy vết được, tăng độ tin cậy & tính minh bạch.
+- **Dependence** (`shap_dependence.png`): tác động của yếu tố mạnh nhất biến thiên theo giá trị.
+
+→ Mô hình không dựa vào tín hiệu giả; lý do gắn cờ là các yếu tố nguy cơ có ý nghĩa lâm sàng.
+
 ## Giới hạn (trung thực)
 
 - **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.

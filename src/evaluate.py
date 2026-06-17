@@ -60,6 +60,19 @@ def save_confusion(y_true, y_pred, labels, title, path):
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
 
 
+def save_roc(curves: dict, title, path):
+    """curves = {tên_model: (y_true, proba)} -> vẽ ROC nhiều model lên một biểu đồ."""
+    from sklearn.metrics import roc_auc_score, roc_curve
+    fig, ax = plt.subplots(figsize=(6, 6))
+    for name, (yt, pr) in curves.items():
+        fpr, tpr, _ = roc_curve(yt, pr)
+        ax.plot(fpr, tpr, lw=2, label=f"{name} (AUC={roc_auc_score(yt, pr):.3f})")
+    ax.plot([0, 1], [0, 1], "k--", lw=1, label="ngẫu nhiên")
+    ax.set_xlabel("False Positive Rate"); ax.set_ylabel("True Positive Rate")
+    ax.set_title(title); ax.legend(loc="lower right", fontsize=9)
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
 def save_regression_scatter(y_true, y_pred, title, path):
     fig, ax = plt.subplots(figsize=(5.5, 5.5))
     ax.scatter(y_true, y_pred, s=5, alpha=0.15, color="#3b6ea5")
@@ -68,6 +81,19 @@ def save_regression_scatter(y_true, y_pred, title, path):
     ax.set_xlim(lim); ax.set_ylim(lim)
     ax.set_xlabel("Điểm thực tế (0–42)"); ax.set_ylabel("Điểm dự đoán")
     ax.set_title(title); ax.legend()
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
+def save_feature_importance_named(clf, names, target, path, top=20):
+    """Như save_feature_importance nhưng nhận sẵn danh sách tên đặc trưng."""
+    if not hasattr(clf, "feature_importances_"):
+        return
+    imp = clf.feature_importances_
+    idx = np.argsort(imp)[::-1][:top]
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ax.barh(range(len(idx))[::-1], imp[idx], color="#3b6ea5")
+    ax.set_yticks(range(len(idx))[::-1]); ax.set_yticklabels([names[i] for i in idx], fontsize=8)
+    ax.set_title(f"Top {top} đặc trưng — {target}"); ax.set_xlabel("Độ quan trọng")
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
 
 

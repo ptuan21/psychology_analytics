@@ -159,6 +159,23 @@ python scripts/model_nhanes.py           # hồi quy logistic đa biến -> Odds
   nữ giới (1.80), đang hút thuốc (1.68), ly hôn/goá (1.59). Thu nhập cao & tuổi ≥66 bảo vệ.
 - → Đòn bẩy hỗ trợ: **giấc ngủ, cai thuốc, vận động, kết nối xã hội**, ưu tiên **giới trẻ**.
 
+## Mô hình dự đoán (có giám sát, chia train/test)
+
+`scripts/train_nhanes.py` huấn luyện mô hình dự đoán **nguy cơ trầm cảm** (PHQ-9 ≥ 10)
+từ nhân khẩu + lối sống (`src/nhanes_model.py`), đánh giá theo 2 cách:
+
+| Cách chia | Mô tả | AUC tốt nhất |
+|-----------|-------|--------------|
+| Ngẫu nhiên phân tầng 80/20 | năng lực dự đoán tổng quát | **0.80** (Random Forest) |
+| Theo thời gian (học ≤2018, kiểm 2021–23) | học quá khứ, dự báo hiện tại | **0.75** (Logistic Reg.) |
+
+- Mất cân bằng lớp (~10% dương) xử lý bằng `class_weight` / `scale_pos_weight`;
+  báo cáo **ROC-AUC + PR-AUC** (phù hợp dữ liệu lệch).
+- **Phát hiện:** AUC tụt ~0.05 khi kiểm theo thời gian → quan hệ **dịch chuyển hậu đại dịch**;
+  mô hình tuyến tính đơn giản tổng quát bền hơn qua thời gian.
+- Đầu ra: `roc_nhanes.png`, `roc_nhanes_temporal.png`, `cm_nhanes.png`,
+  `importance_nhanes.png`, `metrics_nhanes.csv`.
+
 ## Giới hạn (trung thực)
 
 - **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.

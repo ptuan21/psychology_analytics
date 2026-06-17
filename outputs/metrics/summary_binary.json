@@ -1,0 +1,23 @@
+{
+  "mode": "binary",
+  "results": [
+    {
+      "target": "depression",
+      "best_model": "random_forest",
+      "selection_metric": "roc_auc",
+      "best_score": 0.8028
+    },
+    {
+      "target": "anxiety",
+      "best_model": "logreg",
+      "selection_metric": "roc_auc",
+      "best_score": 0.8084
+    },
+    {
+      "target": "stress",
+      "best_model": "xgboost",
+      "selection_metric": "roc_auc",
+      "best_score": 0.8264
+    }
+  ]
+}

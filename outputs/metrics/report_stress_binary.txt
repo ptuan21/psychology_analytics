@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+   Không/Nhẹ      0.686     0.753     0.718      2944
+ Nguy cơ cao      0.803     0.744     0.773      3972
+
+    accuracy                          0.748      6916
+   macro avg      0.744     0.749     0.745      6916
+weighted avg      0.753     0.748     0.749      6916

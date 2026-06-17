@@ -1,5 +1,5 @@
-# Kết quả tự sinh (chạy lại bằng scripts/) — không đưa lên git
-outputs/
+# Model binary nặng (tự sinh lại bằng scripts/run_pipeline.py) — không đưa lên git
+outputs/models/
 
 # Python
 __pycache__/

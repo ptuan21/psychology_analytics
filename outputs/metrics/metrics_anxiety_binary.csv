@@ -1,0 +1,5 @@
+model,accuracy,balanced_accuracy,macro_f1,weighted_f1,roc_auc
+dummy,0.6841,0.5,0.4062,0.5557,
+logreg,0.7373,0.7314,0.714,0.744,0.8084
+random_forest,0.7552,0.7315,0.7246,0.7584,0.808
+xgboost,0.7386,0.7281,0.7134,0.7447,0.8051

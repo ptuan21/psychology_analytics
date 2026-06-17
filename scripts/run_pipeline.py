@@ -71,7 +71,7 @@ def run_target(target: str, X: pd.DataFrame, df: pd.DataFrame, mode: str) -> dic
     evaluate.save_feature_importance(pipe, target,
                                      C.FIG_DIR / f"importance_{target}_{mode}.png")
     joblib.dump({"pipeline": pipe, "labels": labels, "mode": mode},
-                C.MODEL_DIR / f"model_{target}_{mode}.joblib")
+                C.MODEL_DIR / f"model_{target}_{mode}.joblib", compress=3)
     res.to_csv(C.METRIC_DIR / f"metrics_{target}_{mode}.csv")
 
     return {"target": target, "best_model": best,

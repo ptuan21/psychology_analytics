@@ -24,10 +24,10 @@ psy_analysis/
 │   ├── run_pipeline.py        # train + đánh giá end-to-end (theo TASK_MODE)
 │   ├── run_eda.py             # sinh biểu đồ trực quan hoá dữ liệu
 │   └── analyze_framing.py     # phân tích vì sao macro-F1 thấp (3 cách đóng khung)
-├── outputs/
+├── outputs/                   # figures + metrics có trên git; models/ thì không
 │   ├── figures/               # cm_*, scatter_*, importance_*  +  figures/eda/*
 │   ├── metrics/               # metrics_*.csv, report_*.txt, summary_*.json
-│   └── models/                # model_*.joblib (pipeline + nhãn + mode)
+│   └── models/                # model_*.joblib (BỊ .gitignore — tự sinh lại)
 ├── requirements.txt
 └── README.md
 ```

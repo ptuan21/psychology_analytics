@@ -176,6 +176,25 @@ từ nhân khẩu + lối sống (`src/nhanes_model.py`), đánh giá theo 2 cá
 - Đầu ra: `roc_nhanes.png`, `roc_nhanes_temporal.png`, `cm_nhanes.png`,
   `importance_nhanes.png`, `metrics_nhanes.csv`.
 
+### Cải tiến: tuning + calibration + chọn ngưỡng (`scripts/improve_nhanes.py`)
+
+Tách **train 60% / valid 20% / test 20%** (chống rò rỉ): tinh chỉnh siêu tham số trên train,
+**chọn ngưỡng trên valid**, báo cáo trên test.
+
+- **(3) Tuning** (RandomizedSearchCV): XGBoost thắng (CV-AUC 0.794) → test AUC **0.806**.
+- **(2) Calibration** (isotonic): xác suất đầu ra khớp tỉ lệ thực (Brier thấp hơn).
+- **(1) Chọn ngưỡng** — bài học then chốt cho sàng lọc:
+
+| Ngưỡng | Recall | Precision | % bị gắn cờ |
+|--------|:---:|:---:|:---:|
+| Mặc định 0.5 | **0.09** ❌ | 0.50 | 2% |
+| Youden (0.08) | 0.80 | 0.20 | 39% |
+| Recall ≥ 0.80 (0.08) | 0.81 | 0.19 | 42% |
+
+→ Ngưỡng 0.5 **bỏ sót 91% ca** với dữ liệu lệch ~10%; ngưỡng sàng lọc bắt ~80% ca,
+đổi lại cần theo dõi ~40% số người. Đây là đánh đổi đặc trưng của công cụ sàng lọc.
+Đầu ra: `calibration_nhanes.png`, `threshold_nhanes.png`, `nhanes_thresholds.csv`.
+
 ## Giới hạn (trung thực)
 
 - **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.

@@ -73,6 +73,38 @@ def save_roc(curves: dict, title, path):
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
 
 
+def save_calibration(curves: dict, title, path):
+    """curves = {tên: (y_true, proba)} -> reliability diagram + Brier score."""
+    from sklearn.calibration import calibration_curve
+    from sklearn.metrics import brier_score_loss
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.plot([0, 1], [0, 1], "k--", lw=1, label="hoàn hảo")
+    for name, (yt, pr) in curves.items():
+        frac, mean = calibration_curve(yt, pr, n_bins=10, strategy="quantile")
+        b = brier_score_loss(yt, pr)
+        ax.plot(mean, frac, "o-", label=f"{name} (Brier={b:.3f})")
+    ax.set_xlabel("Xác suất dự đoán trung bình"); ax.set_ylabel("Tỉ lệ dương thực tế")
+    ax.set_title(title); ax.legend(loc="upper left", fontsize=9)
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
+def save_threshold_curve(y_true, proba, title, path, marks=None):
+    """Precision/Recall/F1 theo ngưỡng + đánh dấu các ngưỡng đã chọn."""
+    from sklearn.metrics import precision_recall_curve
+    prec, rec, thr = precision_recall_curve(y_true, proba)
+    f1 = 2 * prec * rec / (prec + rec + 1e-9)
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.plot(thr, prec[:-1], label="Precision", color="#4f81bd")
+    ax.plot(thr, rec[:-1], label="Recall", color="#c0504d")
+    ax.plot(thr, f1[:-1], label="F1", color="#9bbb59")
+    for name, t in (marks or {}).items():
+        ax.axvline(t, ls="--", color="grey", lw=1)
+        ax.text(t, 1.01, name, rotation=90, fontsize=7, va="bottom", ha="center")
+    ax.set_xlabel("Ngưỡng xác suất"); ax.set_ylabel("Giá trị"); ax.set_title(title)
+    ax.legend(loc="center left"); ax.grid(alpha=0.3)
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
 def save_regression_scatter(y_true, y_pred, title, path):
     fig, ax = plt.subplots(figsize=(5.5, 5.5))
     ax.scatter(y_true, y_pred, s=5, alpha=0.15, color="#3b6ea5")

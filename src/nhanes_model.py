@@ -73,6 +73,24 @@ def fit_pipeline(name, est, X_tr, y_tr) -> Pipeline:
     return pipe
 
 
+# Lưới siêu tham số cho RandomizedSearchCV (tiền tố clf__ vì tune trong pipeline)
+RF_GRID = {
+    "clf__n_estimators": [300, 500, 800],
+    "clf__max_depth": [None, 8, 12, 20],
+    "clf__min_samples_leaf": [5, 10, 20, 40],
+    "clf__max_features": ["sqrt", 0.5, 0.3],
+}
+XGB_GRID = {
+    "clf__n_estimators": [300, 500, 800],
+    "clf__max_depth": [3, 4, 5, 6],
+    "clf__learning_rate": [0.02, 0.04, 0.08],
+    "clf__subsample": [0.7, 0.9],
+    "clf__colsample_bytree": [0.6, 0.8, 1.0],
+    "clf__min_child_weight": [1, 5, 10],
+}
+GRIDS = {"random_forest": RF_GRID, "xgboost": XGB_GRID}
+
+
 def feature_names(prep: ColumnTransformer) -> list:
     ohe = prep.named_transformers_["cat"].named_steps["onehot"]
     return list(NUMERIC) + list(ohe.get_feature_names_out(CATEGORICAL))

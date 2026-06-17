@@ -278,6 +278,23 @@ việc làm (OCQ), bảo hiểm y tế (HIQ). Sau đó đo sức mạnh dự đo
 - **Chủng tộc:** nhóm Other/Multi độ nhạy thấp (0.69 — bỏ sót nhiều ca hơn).
 - → **Hàm ý:** nên **ngưỡng/hiệu chỉnh riêng theo nhóm**, không dùng một ngưỡng chung máy móc; báo cáo công bằng cùng độ chính xác.
 
+### Tối ưu "tránh bỏ sót" (`scripts/optimize_recall_nhanes.py`)
+
+Sàng lọc ưu tiên **không bỏ sót ca** (độ nhạy cao). Với mô hình cố định, độ nhạy do **ngưỡng**
+quyết định — đánh đổi với số người phải theo dõi (test: 719 ca dương):
+
+| Mục tiêu độ nhạy | Ngưỡng | **Bỏ sót (FN)** | Tỉ lệ gắn cờ | NNS* |
+|:---:|:---:|:---:|:---:|:---:|
+| 0.80 | 0.071 | 131 ca | 43% | 5.4 |
+| 0.90 | 0.044 | 66 ca | 59% | 6.7 |
+| **0.95** | 0.028 | **chỉ 16 ca** | 75% | 7.9 |
+
+*NNS = số người phải sàng để bắt 1 ca. → Muốn bỏ sót ít hơn thì gắn cờ nhiều hơn; chọn điểm vận hành theo nguồn lực.
+
+**Ngưỡng riêng theo nhóm (equal-sensitivity):** một ngưỡng chung bỏ sót nhiều hơn ở nhóm
+**26–35 (sens 0.86) và 66+ (0.84)**. Đặt ngưỡng riêng cho mỗi nhóm tuổi → kéo **mọi nhóm về ≥0.90**,
+**không nhóm nào bị bỏ sót có hệ thống** (cải thiện công bằng; tổng số bỏ sót do điểm vận hành chung quyết định).
+
 ## 🖼️ Thư viện kết quả (biểu đồ)
 
 **Xu hướng trầm cảm theo thời gian × tuổi × bậc học** (NHANES, có trọng số)
@@ -313,6 +330,12 @@ Ngủ <6h (OR 2.53), sức khỏe kém (2.23), nữ (1.80), hút thuốc (1.68).
 **Kiểm toán công bằng** — chênh lệch độ nhạy/FPR/tỉ lệ gắn cờ giữa các nhóm (thu nhập lệch nhiều nhất)
 
 ![Fairness theo nhóm](outputs/figures/nhanes/fairness_threshold.png)
+
+**Tối ưu tránh bỏ sót** — đánh đổi độ nhạy ↔ tỉ lệ gắn cờ & ngưỡng riêng theo nhóm tuổi
+
+| Đánh đổi độ nhạy/chi phí | Ngưỡng riêng → không bỏ sót nhóm nào |
+|---|---|
+| ![](outputs/figures/nhanes/recall_tradeoff.png) | ![](outputs/figures/nhanes/equal_sensitivity.png) |
 
 ## Giới hạn (trung thực)
 

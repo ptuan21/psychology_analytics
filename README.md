@@ -208,6 +208,26 @@ Dùng `TreeExplainer` (XGBoost) để mở "hộp đen" — biết **vì sao** m
 
 → Mô hình không dựa vào tín hiệu giả; lý do gắn cờ là các yếu tố nguy cơ có ý nghĩa lâm sàng.
 
+### Mô hình theo nhóm yếu tố xã hội & con người (`scripts/factor_models_nhanes.py`)
+
+Bổ sung **3 yếu tố xã hội thật** vào dữ liệu (NHANES): an ninh lương thực (FSQ),
+việc làm (OCQ), bảo hiểm y tế (HIQ). Sau đó đo sức mạnh dự đoán của **4 nhóm yếu tố**.
+
+**Sức mạnh dự đoán riêng (AUC standalone):**
+
+| Nhóm | AUC | Ghi chú |
+|------|:---:|---------|
+| **Xã hội** (học vấn, thu nhập, an ninh LT, việc làm, bảo hiểm, hôn nhân) | **0.712** | mạnh nhất trong nhóm can thiệp được |
+| Sức khỏe tự đánh giá | 0.725 | (gần hệ quả của trầm cảm — đọc thận trọng) |
+| Con người/lối sống (ngủ, vận động, hút thuốc) | 0.659 | |
+| Nhân khẩu (tuổi, giới, chủng tộc) | 0.582 | yếu |
+
+**Đóng góp riêng (ΔAUC khi thêm dần):** Xã hội **+0.148** (lớn nhất, ~5× lối sống +0.029).
+→ **Yếu tố xã hội là động lực dự báo trầm cảm mạnh nhất** — khớp lý thuyết *social determinants of health*.
+
+**Ensemble (stacking LogReg+RF+XGB):** AUC **0.801 → 0.821**. Đầu ra:
+`factor_domain_standalone.png`, `factor_domain_incremental.png`, `factor_domains.csv`.
+
 ## Giới hạn (trung thực)
 
 - **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.

@@ -8,7 +8,8 @@ mkdir -p raw
 # suffix:năm_bắt_đầu:nhãn_chu_kỳ
 rows="E:2007:2007-2008 F:2009:2009-2010 G:2011:2011-2012 H:2013:2013-2014 I:2015:2015-2016 J:2017:2017-2018 L:2021:2021-2023"
 # DEMO=nhân khẩu, DPQ=PHQ-9, SLQ=ngủ, ALQ=rượu, PAQ=vận động, SMQ=hút thuốc, HUQ=sức khoẻ tự đánh giá
-comps="DEMO DPQ SLQ ALQ PAQ SMQ HUQ"
+# FSQ=an ninh lương thực, OCQ=việc làm, HIQ=bảo hiểm y tế (yếu tố xã hội)
+comps="DEMO DPQ SLQ ALQ PAQ SMQ HUQ FSQ OCQ HIQ"
 
 get(){
   comp=$1; suf=$2; start=$3; cyc=$4; out="raw/${comp}_${suf}.xpt"

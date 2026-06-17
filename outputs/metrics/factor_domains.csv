@@ -1,0 +1,10 @@
+nhóm,loại,AUC,PR_AUC,dAUC
+Demographic,standalone,0.5822,0.1251,
+Social,standalone,0.7125,0.2276,
+Human/lối sống,standalone,0.6591,0.1949,
+Health,standalone,0.7251,0.2103,
++Demographic,cumulative,0.5822,0.1251,0.0822
++Social,cumulative,0.7297,0.2672,0.1476
++Human/lối sống,cumulative,0.7589,0.3067,0.0291
++Health,cumulative,0.801,0.3475,0.0421
+Ensemble (stacking),ensemble,0.8206,0.3677,

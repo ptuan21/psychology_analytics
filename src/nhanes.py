@@ -77,7 +77,7 @@ def build_cycle(suf):
 
     # gộp các thành phần vào DEMO theo SEQN
     df = demo.copy()
-    for comp in ["DPQ", "SLQ", "ALQ", "PAQ", "SMQ", "HUQ"]:
+    for comp in ["DPQ", "SLQ", "ALQ", "PAQ", "SMQ", "HUQ", "FSQ", "OCQ", "HIQ"]:
         part = _read(comp, suf)
         if part is not None:
             df = df.merge(part, on="SEQN", how="left", suffixes=("", f"_{comp}"))
@@ -120,6 +120,16 @@ def build_cycle(suf):
     out["sedentary_min"] = _na(df.get("PAD680", np.nan), [7777, 9999])
     out["smoke_status"] = _smoke(df)
     out["gen_health"] = _na(df.get("HUQ010", np.nan), [7, 9])  # 1=Excellent..5=Poor
+
+    # yếu tố XÃ HỘI bổ sung
+    fs = _na(df.get("FSDAD", np.nan), [7, 9, 99])               # 1=Full..4=Very low (adult food security)
+    out["food_security"] = fs
+    out["food_insecure"] = np.where(fs.isin([3, 4]), 1.0,
+                                    np.where(fs.isin([1, 2]), 0.0, np.nan))
+    emp = _na(df.get("OCD150", np.nan), [7, 9])                 # tình trạng việc làm tuần qua
+    out["employment"] = emp.map({1: "employed", 2: "employed",
+                                 3: "unemployed", 4: "not_in_labor"})
+    out["insured"] = _na(df.get("HIQ011", np.nan), [7, 9]).map({1: 1, 2: 0})  # có bảo hiểm y tế
     return out
 
 

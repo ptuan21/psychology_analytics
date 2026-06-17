@@ -20,8 +20,10 @@ from xgboost import XGBClassifier
 from . import config as C
 
 TARGET = "dep_risk"
-NUMERIC = ["age", "income_poverty", "sleep_hours", "sedentary_min", "gen_health", "year"]
-CATEGORICAL = ["gender", "education_label", "race", "marital", "smoke_status"]
+NUMERIC = ["age", "income_poverty", "sleep_hours", "sedentary_min", "gen_health",
+           "year", "food_security"]
+CATEGORICAL = ["gender", "education_label", "race", "marital", "smoke_status",
+               "employment", "insured"]
 
 
 def select_xy(df: pd.DataFrame):

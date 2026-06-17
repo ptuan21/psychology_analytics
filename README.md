@@ -181,15 +181,16 @@ từ nhân khẩu + lối sống (`src/nhanes_model.py`), đánh giá theo 2 cá
 Tách **train 60% / valid 20% / test 20%** (chống rò rỉ): tinh chỉnh siêu tham số trên train,
 **chọn ngưỡng trên valid**, báo cáo trên test.
 
-- **(3) Tuning** (RandomizedSearchCV): XGBoost thắng (CV-AUC 0.794) → test AUC **0.806**.
+- **(3) Tuning** (RandomizedSearchCV): XGBoost thắng (CV-AUC 0.807) → test AUC **0.819**
+  (tăng từ 0.806 nhờ thêm yếu tố xã hội).
 - **(2) Calibration** (isotonic): xác suất đầu ra khớp tỉ lệ thực (Brier thấp hơn).
 - **(1) Chọn ngưỡng** — bài học then chốt cho sàng lọc:
 
 | Ngưỡng | Recall | Precision | % bị gắn cờ |
 |--------|:---:|:---:|:---:|
-| Mặc định 0.5 | **0.09** ❌ | 0.50 | 2% |
-| Youden (0.08) | 0.80 | 0.20 | 39% |
-| Recall ≥ 0.80 (0.08) | 0.81 | 0.19 | 42% |
+| Mặc định 0.5 | **0.11** ❌ | 0.52 | 2% |
+| Youden (0.075) | 0.78 | 0.21 | 36% |
+| Recall ≥ 0.80 (0.071) | 0.84 | 0.20 | 41% |
 
 → Ngưỡng 0.5 **bỏ sót 91% ca** với dữ liệu lệch ~10%; ngưỡng sàng lọc bắt ~80% ca,
 đổi lại cần theo dõi ~40% số người. Đây là đánh đổi đặc trưng của công cụ sàng lọc.

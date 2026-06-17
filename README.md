@@ -1,4 +1,19 @@
-# Dự đoán mức độ Trầm cảm / Lo âu / Stress (DASS) từ nhân khẩu học + tính cách
+# Phân tích & Dự đoán Sức khỏe Tâm lý — DASS & NHANES
+
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![License](https://img.shields.io/badge/code-MIT-green)
+![Data](https://img.shields.io/badge/data-NHANES%20%7C%20DASS%20(public)-orange)
+![Reproducible](https://img.shields.io/badge/reproducible-100%25-brightgreen)
+![Models](https://img.shields.io/badge/AUC-0.82-blueviolet)
+
+> **Tổng quan:** Dự án 2 trụ trên **dữ liệu công khai thật**: (1) mô hình dự đoán mức độ
+> **DASS** từ nhân khẩu + tính cách; (2) phân tích dịch tễ **NHANES 2007–2023** (~72k người)
+> về xu hướng trầm cảm theo tuổi/bậc học/yếu tố xã hội + công cụ sàng lọc giải thích được.
+> Toàn bộ **tái lập 100%**, dữ liệu mở để **nghiên cứu kế thừa**.
+
+---
+
+## Trụ 1 — Dự đoán mức độ DASS (nhân khẩu học + tính cách)
 
 Bài toán **phân loại đa lớp**: từ điểm DASS-42 tính ra nhãn severity
 (*Normal / Mild / Moderate / Severe / Extremely Severe*) cho 3 thang
@@ -314,3 +329,28 @@ python scripts/build_nhanes.py      # dựng lại nhanes_pooled.csv
 - Mô hình riêng cho giới trẻ 18–35; thêm yếu tố NHANES khác (giấc ngủ chi tiết, dinh dưỡng…).
 - Kiểm định ở dữ liệu quốc gia khác; thu thập sơ cấp theo `codebook_extension.txt`.
 - Phân tích nhân quả (cần dữ liệu theo thời gian / can thiệp — xem mục Giới hạn).
+
+## 📑 Cách trích dẫn (How to cite)
+
+Nếu bạn dùng lại code hoặc bảng dữ liệu đã hài hoà, vui lòng trích dẫn repo:
+
+```bibtex
+@misc{psych_analytics_2026,
+  author = {ptuan21},
+  title  = {Psychology Analytics: DASS & NHANES Depression Analysis and Screening},
+  year   = {2026},
+  howpublished = {\url{https://github.com/ptuan21/psychology_analytics}}
+}
+```
+
+Và trích dẫn các nguồn gốc:
+- **NHANES** — Centers for Disease Control and Prevention (CDC), National Center for Health
+  Statistics. National Health and Nutrition Examination Survey, 2007–2023.
+- **PHQ-9** — Kroenke K, Spitzer RL, Williams JBW (2001); độ chính xác sàng lọc: Levis B et al.,
+  *BMJ* 2019;365:l1476.
+- **DASS** — Lovibond SH, Lovibond PF (1995). **TIPI** — Gosling SD, Rentfrow PJ, Swann WB (2003).
+
+## 📜 License
+
+- **Code:** MIT (xem `LICENSE`).
+- **Dữ liệu:** NHANES là public domain (CDC); DASS từ OpenPsychometrics — theo điều khoản nguồn gốc.

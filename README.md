@@ -237,6 +237,38 @@ việc làm (OCQ), bảo hiểm y tế (HIQ). Sau đó đo sức mạnh dự đo
 **Ensemble (stacking LogReg+RF+XGB):** AUC **0.801 → 0.821**. Đầu ra:
 `factor_domain_standalone.png`, `factor_domain_incremental.png`, `factor_domains.csv`.
 
+## 🖼️ Thư viện kết quả (biểu đồ)
+
+**Xu hướng trầm cảm theo thời gian × tuổi × bậc học** (NHANES, có trọng số)
+
+Người trẻ 18–25 tăng từ ~7% → **19.8%**; nhóm ≥50 gần như không đổi.
+
+![Xu hướng theo nhóm tuổi](outputs/figures/nhanes/trend_by_age.png)
+
+| Theo bậc học | Ai tăng nhanh nhất | Tuổi × Bậc học |
+|---|---|---|
+| ![](outputs/figures/nhanes/trend_by_education.png) | ![](outputs/figures/nhanes/delta_by_group.png) | ![](outputs/figures/nhanes/heatmap_age_education.png) |
+
+**Yếu tố nguy cơ** — hồi quy đa biến (OR, CI design-based) & đóng góp theo nhóm
+
+Ngủ <6h (OR 2.53), sức khỏe kém (2.23), nữ (1.80), hút thuốc (1.68). Nhóm **Xã hội đóng góp ΔAUC +0.148 — lớn nhất**.
+
+| Forest plot Odds Ratio | Sức mạnh dự đoán từng nhóm yếu tố |
+|---|---|
+| ![](outputs/figures/nhanes/odds_ratios.png) | ![](outputs/figures/nhanes/factor_domain_standalone.png) |
+
+**Mô hình dự đoán & sàng lọc** — AUC 0.82, hiệu chỉnh xác suất, đặc tả Se/Sp/NPV/LR
+
+| ROC | Calibration | Precision/Recall theo ngưỡng |
+|---|---|---|
+| ![](outputs/figures/nhanes/roc_nhanes.png) | ![](outputs/figures/nhanes/calibration_nhanes.png) | ![](outputs/figures/nhanes/threshold_nhanes.png) |
+
+**Giải thích SHAP** — toàn cục & từng cá nhân (an ninh lương thực, việc làm đẩy rủi ro)
+
+| Toàn cục (beeswarm) | Một ca cụ thể (waterfall) |
+|---|---|
+| ![](outputs/figures/nhanes/shap_beeswarm.png) | ![](outputs/figures/nhanes/shap_case_food1.png) |
+
 ## Giới hạn (trung thực)
 
 - **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.
@@ -255,3 +287,30 @@ việc làm (OCQ), bảo hiểm y tế (HIQ). Sau đó đo sức mạnh dự đo
 giải thích SHAP) — **không phải chẩn đoán y tế** và không thay thế đánh giá của chuyên gia;
 một kết quả dương tính chỉ nên dẫn tới **đánh giá sâu hơn**, không phải kết luận.
 Xem thêm `data/codebook_extension.txt` (quy trình thu thập + an toàn) nếu mở rộng thu dữ liệu mới.
+
+---
+
+## 📂 Dữ liệu & tái sử dụng (cho nghiên cứu kế thừa)
+
+Dữ liệu đã **công khai trên repo** để ai cũng có thể kế thừa & mở rộng:
+
+| File | Mô tả | Nguồn / Giấy phép |
+|------|-------|-------------------|
+| `data/data.csv` | DASS-42 + TIPI + nhân khẩu (~40k người) | OpenPsychometrics — public |
+| `data/codebook.txt` | Codebook DASS | — |
+| `data/nhanes/nhanes_pooled.csv` | NHANES gộp 2007–2023 (~72k người) | NHANES/CDC — **public domain** |
+| `data/nhanes/CODEBOOK_pooled.md` | **Data dictionary** đầy đủ cho bảng gộp | — |
+| `data/codebook_extension.txt` | Quy trình thu thập mở rộng (đạo đức/an toàn) | — |
+
+**Tái lập từ đầu (kể cả file thô):**
+```bash
+pip install -r requirements.txt
+bash   scripts/fetch_nhanes.sh      # tải .xpt thật từ CDC (file thô gitignore vì nặng)
+python scripts/build_nhanes.py      # dựng lại nhanes_pooled.csv
+```
+
+**Gợi ý hướng nghiên cứu kế thừa:**
+- Phân tích theo bang/vùng, sắc tộc, hoặc tương tác đa yếu tố sâu hơn.
+- Mô hình riêng cho giới trẻ 18–35; thêm yếu tố NHANES khác (giấc ngủ chi tiết, dinh dưỡng…).
+- Kiểm định ở dữ liệu quốc gia khác; thu thập sơ cấp theo `codebook_extension.txt`.
+- Phân tích nhân quả (cần dữ liệu theo thời gian / can thiệp — xem mục Giới hạn).

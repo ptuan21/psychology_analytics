@@ -186,11 +186,16 @@ Tách **train 60% / valid 20% / test 20%** (chống rò rỉ): tinh chỉnh siê
 - **(2) Calibration** (isotonic): xác suất đầu ra khớp tỉ lệ thực (Brier thấp hơn).
 - **(1) Chọn ngưỡng** — bài học then chốt cho sàng lọc:
 
-| Ngưỡng | Recall | Precision | % bị gắn cờ |
-|--------|:---:|:---:|:---:|
-| Mặc định 0.5 | **0.11** ❌ | 0.52 | 2% |
-| Youden (0.075) | 0.78 | 0.21 | 36% |
-| Recall ≥ 0.80 (0.071) | 0.84 | 0.20 | 41% |
+| Ngưỡng | Sens | Spec | PPV | **NPV** | LR− | % gắn cờ |
+|--------|:---:|:---:|:---:|:---:|:---:|:---:|
+| Mặc định 0.5 | 0.11 ❌ | 0.99 | 0.52 | 0.91 | 0.90 | 2% |
+| Youden (0.075) | 0.78 | 0.69 | 0.21 | **0.97** | 0.32 | 36% |
+| Recall ≥ 0.80 (0.071) | 0.84 | 0.63 | 0.20 | **0.97** | 0.26 | 41% |
+
+**Đặc tả như test sàng lọc:** NPV **0.97** (âm tính loại trừ tốt — đúng vai trò sàng lọc),
+LR− 0.26–0.32. Đầu ra dự đoán nhãn **PHQ-9 ≥ 10** — bản thân PHQ-9 là thang đã kiểm định
+(Se≈0.85, Sp≈0.85 vs phỏng vấn lâm sàng, Levis et al. *BMJ* 2019). Đây là công cụ **sàng lọc
+& phân tầng**, có đặc tính vận hành rõ ràng — **không** thay thế chẩn đoán của chuyên gia.
 
 → Ngưỡng 0.5 **bỏ sót 91% ca** với dữ liệu lệch ~10%; ngưỡng sàng lọc bắt ~80% ca,
 đổi lại cần theo dõi ~40% số người. Đây là đánh đổi đặc trưng của công cụ sàng lọc.
@@ -235,14 +240,18 @@ việc làm (OCQ), bảo hiểm y tế (HIQ). Sau đó đo sức mạnh dự đo
 ## Giới hạn (trung thực)
 
 - **Cắt ngang** (không theo dõi cùng người) → tương quan, **không nhân quả**.
-- Trọng số cho ước lượng đại diện, nhưng **khoảng tin cậy OR là xấp xỉ** (chưa mô hình hoá
-  đầy đủ thiết kế chọn mẫu phức tạp). Học vấn chỉ hỏi người ≥20; thiếu 2019–2020 (COVID).
+- Khoảng tin cậy OR là **design-based** — sai số chuẩn **cụm-vững theo PSU lồng trong tầng**
+  (đúng thiết kế NHANES), nên CI rộng & trung thực, không còn xấp xỉ hẹp. Mọi phát hiện
+  chính vẫn có ý nghĩa thống kê dưới CI nghiêm ngặt này.
+- Học vấn chỉ hỏi người ≥20; thiếu 2019–2020 (COVID).
 - File `.xpt` thô bị `.gitignore` (tải lại bằng `fetch_nhanes.sh`); giữ `nhanes_pooled.csv`.
 
 ---
 
 ## Lưu ý đạo đức
 
-Đây là dữ liệu khảo sát ẩn danh dùng cho mục đích học tập. Các mô hình **không**
-là công cụ chẩn đoán y tế và không nên dùng để ra quyết định về cá nhân thực.
+Đây là dữ liệu khảo sát ẩn danh dùng cho mục đích học tập. Các mô hình là công cụ
+**sàng lọc & phân tầng nguy cơ** (đã đặc tả Se/Sp/PPV/NPV/LR, hiệu chỉnh xác suất,
+giải thích SHAP) — **không phải chẩn đoán y tế** và không thay thế đánh giá của chuyên gia;
+một kết quả dương tính chỉ nên dẫn tới **đánh giá sâu hơn**, không phải kết luận.
 Xem thêm `data/codebook_extension.txt` (quy trình thu thập + an toàn) nếu mở rộng thu dữ liệu mới.

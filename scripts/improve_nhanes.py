@@ -6,7 +6,13 @@ CẢI TIẾN mô hình dự đoán trầm cảm (NHANES) — 3 bước, chống 
 
   (3) Tuning: RandomizedSearchCV cho RF & XGB, chọn model có CV-AUC cao nhất.
   (2) Calibration: CalibratedClassifierCV (isotonic) -> xác suất tin cậy (Brier thấp hơn).
-  (1) Threshold: chọn ngưỡng cho sàng lọc (recall mục tiêu ~0.80) & Youden's J.
+  (1) Threshold: chọn ngưỡng cho sàng lọc (recall mục tiêu ~0.80) & Youden's J,
+      ĐẶC TẢ như một test sàng lọc: độ nhạy/đặc hiệu/PPV/NPV/LR+/LR-.
+
+Đây là công cụ SÀNG LỌC (không phải chẩn đoán): dự đoán nhãn PHQ-9 ≥ 10 — bản thân
+PHQ-9 là thang sàng lọc đã kiểm định (Se≈0.85, Sp≈0.85 cho trầm cảm nặng so với phỏng
+vấn lâm sàng; Levis et al. BMJ 2019). Vì vậy đầu ra cần hiểu là "khả năng sàng lọc dương",
+dùng để PHÂN TẦNG & chuyển tuyến, không thay thế đánh giá của chuyên gia.
 
 Chạy:  python3 scripts/improve_nhanes.py
 """
@@ -48,10 +54,18 @@ def tune(name, X, y):
 
 
 def metrics_at(y, proba, thr):
+    """Chỉ số SÀNG LỌC đầy đủ tại một ngưỡng (đặc tả như một test sàng lọc)."""
     pred = (proba >= thr).astype(int)
-    return {"thr": round(thr, 3), "recall": round(recall_score(y, pred), 3),
-            "precision": round(precision_score(y, pred, zero_division=0), 3),
-            "f1": round(f1_score(y, pred), 3),
+    tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
+    sens = tp / (tp + fn) if tp + fn else 0          # = recall = độ nhạy
+    spec = tn / (tn + fp) if tn + fp else 0          # độ đặc hiệu
+    ppv = tp / (tp + fp) if tp + fp else 0           # = precision
+    npv = tn / (tn + fn) if tn + fn else 0
+    lr_plus = sens / (1 - spec) if spec < 1 else float("inf")
+    lr_minus = (1 - sens) / spec if spec > 0 else float("inf")
+    return {"thr": round(thr, 3), "sens(recall)": round(sens, 3),
+            "spec": round(spec, 3), "PPV": round(ppv, 3), "NPV": round(npv, 3),
+            "LR+": round(lr_plus, 2), "LR-": round(lr_minus, 2),
             "flag_rate": round(pred.mean(), 3)}
 
 

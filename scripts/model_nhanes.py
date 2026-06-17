@@ -9,9 +9,10 @@ Hai mô hình:
   (1) Mô hình đầy đủ      -> OR cho mọi yếu tố (forest plot + bảng).
   (2) Mô hình tương tác   -> kiểm định "người trẻ tăng nhanh hơn" (age_group × year).
 
-⚠️ Lưu ý phương pháp: dùng trọng số khảo sát (chuẩn hoá về cỡ mẫu) cho ước lượng OR.
-Khoảng tin cậy là XẤP XỈ — chưa mô hình hoá đầy đủ thiết kế chọn mẫu phức tạp
-(phân tầng/cụm) của NHANES. Đủ cho mục tiêu khám phá, không dùng để công bố lâm sàng.
+Phương pháp: trọng số khảo sát (chuẩn hoá về cỡ mẫu) cho ước lượng OR, và
+KHOẢNG TIN CẬY DESIGN-BASED — sai số chuẩn cụm-vững theo PSU lồng trong tầng
+(SDMVPSU trong SDMVSTRA), phản ánh thiết kế chọn mẫu phức tạp của NHANES.
+CI vì thế rộng & trung thực hơn so với SE ngây thơ từ freq_weights.
 
 Chạy:  python3 scripts/model_nhanes.py
 """
@@ -59,12 +60,14 @@ def prepare(df: pd.DataFrame) -> pd.DataFrame:
         d[c + "_z"] = (d[c] - d[c].mean()) / d[c].std()
     d["genhealth"] = d["gen_health"]          # 1..5, OR cho mỗi mức xấu hơn
     d["year_c"] = (d["year"] - 2007) / 10.0   # mỗi 10 năm
-    # trọng số chuẩn hoá về cỡ mẫu (giảm tính chống-bảo thủ của SE)
+    # trọng số chuẩn hoá về cỡ mẫu
     cols = ["dep", "age_group", "gender", "edu", "race_l", "marital", "smoke_l",
             "sleep_g", "income_poverty_z", "sedentary_min_z", "genhealth",
-            "year_c", "weight"]
+            "year_c", "weight", "strata", "psu"]
     d = d.dropna(subset=cols)
     d["w"] = d["weight"] * len(d) / d["weight"].sum()
+    # cụm = PSU lồng trong tầng -> dùng cho SE design-based (cụm-vững)
+    d["cluster"] = d["strata"].astype(int) * 100 + d["psu"].astype(int)
     return d
 
 
@@ -72,8 +75,9 @@ def fit_full(d):
     f = ("dep ~ C(age_group) + C(gender) + C(edu) + C(race_l) + C(marital)"
          " + C(smoke_l) + C(sleep_g) + income_poverty_z + sedentary_min_z"
          " + genhealth + year_c")
-    return smf.glm(f, data=d, family=sm.families.Binomial(),
-                   freq_weights=d["w"]).fit()
+    glm = smf.glm(f, data=d, family=sm.families.Binomial(), freq_weights=d["w"])
+    # SE design-based: cụm-vững theo PSU-trong-tầng (đúng thiết kế NHANES, CI không còn xấp xỉ hẹp)
+    return glm.fit(cov_type="cluster", cov_kwds={"groups": d["cluster"].values})
 
 
 PRETTY = {  # rút gọn tên term cho dễ đọc
@@ -134,7 +138,8 @@ def forest_plot(t, path):
 def interaction_test(d):
     """Kiểm định người trẻ tăng nhanh hơn: age_group × year_c."""
     f = "dep ~ C(age_group) * year_c"
-    res = smf.glm(f, data=d, family=sm.families.Binomial(), freq_weights=d["w"]).fit()
+    res = smf.glm(f, data=d, family=sm.families.Binomial(), freq_weights=d["w"]).fit(
+        cov_type="cluster", cov_kwds={"groups": d["cluster"].values})
     rows = []
     for term in res.params.index:
         if ":year_c" in term:

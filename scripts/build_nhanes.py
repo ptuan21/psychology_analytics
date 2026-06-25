@@ -1,10 +1,3 @@
-"""
-Dựng bảng NHANES gộp 2007–2023 từ các file .xpt thật (data/nhanes/raw/)
-và kiểm tra nhanh xu hướng trầm cảm theo thời gian.
-
-Chạy:  python3 scripts/build_nhanes.py
-Đầu ra: data/nhanes/nhanes_pooled.csv
-"""
 import sys
 from pathlib import Path
 

@@ -2,7 +2,6 @@
 Phân tích xu hướng trầm cảm (NHANES 2007–2023) theo THỜI GIAN × TUỔI × BẬC HỌC,
 và liên hệ với các yếu tố CAN THIỆP ĐƯỢC. Tất cả ước lượng đều DÙNG TRỌNG SỐ khảo sát
 (WTMEC2YR) để cho ra tỉ lệ đại diện dân số (không phải tỉ lệ thô của mẫu).
-
 Đầu ra:
   outputs/figures/nhanes/trend_overall.png        xu hướng chung + theo giới
   outputs/figures/nhanes/trend_by_age.png         theo nhóm tuổi qua các chu kỳ
@@ -11,8 +10,6 @@ và liên hệ với các yếu tố CAN THIỆP ĐƯỢC. Tất cả ước lư
   outputs/figures/nhanes/delta_by_group.png        nhóm nào tăng nhanh nhất
   outputs/figures/nhanes/modifiable_factors.png    trầm cảm theo ngủ/hút thuốc/vận động
   outputs/metrics/nhanes_summary.txt               số liệu chính
-
-Chạy:  python3 scripts/analyze_nhanes_trends.py
 """
 import sys
 from pathlib import Path

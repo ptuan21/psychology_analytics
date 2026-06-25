@@ -1,12 +1,3 @@
-"""
-Phân tích vì sao macro-F1 ~0.35 và liệu mô hình có thực sự "kém" không.
-
-Kiểm 3 cách ĐÓNG KHUNG LẠI bài toán (cùng đặc trưng, cùng dữ liệu):
-  1. Adjacent accuracy: dự đoán có lệch <= 1 mức so với thực tế không?
-     (vì Mild/Moderate/Severe là các lát cắt nhân tạo trên 1 thang liên tục)
-  2. Nhị phân "nguy cơ cao" (Moderate trở lên) -> đo ROC-AUC.
-  3. Hồi quy điểm liên tục 0..42 -> đo MAE & Spearman.
-"""
 import sys
 from pathlib import Path
 

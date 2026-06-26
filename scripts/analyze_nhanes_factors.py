@@ -1,12 +1,3 @@
-"""
-Mở rộng phân tích: trầm cảm theo NHIỀU yếu tố (ngoài tuổi & bậc học) — đều có trọng số.
-Đầu ra (outputs/figures/nhanes/):
-  factor_prevalence.png   tỉ lệ trầm cảm theo giới / chủng tộc / hôn nhân / thu nhập /
-                          sức khoẻ tự đánh giá / hút thuốc / vận động / giấc ngủ (8 panel)
-  trend_by_income.png     xu hướng theo mức thu nhập qua các chu kỳ
-  trend_by_race.png       xu hướng theo chủng tộc qua các chu kỳ
-  trend_by_gender_age.png xu hướng theo giới × nhóm tuổi (ai tăng nhanh nhất)
-"""
 import sys
 from pathlib import Path
 

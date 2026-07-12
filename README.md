@@ -214,7 +214,18 @@ LR− 0.26–0.32. Đầu ra dự đoán nhãn **PHQ-9 ≥ 10** — bản thân 
 
 → Ngưỡng 0.5 **bỏ sót 91% ca** với dữ liệu lệch ~10%; ngưỡng sàng lọc bắt ~80% ca,
 đổi lại cần theo dõi ~40% số người. Đây là đánh đổi đặc trưng của công cụ sàng lọc.
-Đầu ra: `calibration_nhanes.png`, `threshold_nhanes.png`, `nhanes_thresholds.csv`.
+
+**Decision Curve Analysis** — AUC/calibration đo *độ phân biệt/độ tin cậy xác suất*, nhưng
+không trả lời "có nên dùng mô hình để ra quyết định không". DCA đo **net benefit** (Vickers &
+Elkin 2006) so với hai chiến lược mốc "gắn cờ tất cả" và "không gắn cờ ai":
+
+- Mô hình có **net benefit dương và vượt trội "gắn cờ tất cả"** ở mọi ngưỡng từ ~0.01–0.5 —
+  đúng vùng chứa cả 2 ngưỡng vận hành đã chọn (Youden 0.075, Recall≥0.80 0.071).
+- Sau ~pt 0.5, net benefit về gần 0 (không còn lợi ích rõ ràng) — nhất quán với việc *không*
+  dùng ngưỡng mặc định 0.5 cho bài toán sàng lọc lệch lớp này.
+
+Đầu ra: `calibration_nhanes.png`, `threshold_nhanes.png`, `nhanes_thresholds.csv`
+(nay có thêm cột `net_benefit`), `decision_curve_nhanes.png`.
 
 ### Giải thích mô hình bằng SHAP (`scripts/explain_nhanes.py`)
 
@@ -317,9 +328,9 @@ Ngủ <6h (OR 2.53), sức khỏe kém (2.23), nữ (1.80), hút thuốc (1.68).
 
 **Mô hình dự đoán & sàng lọc** — AUC 0.82, hiệu chỉnh xác suất, đặc tả Se/Sp/NPV/LR
 
-| ROC | Calibration | Precision/Recall theo ngưỡng |
-|---|---|---|
-| ![](outputs/figures/nhanes/roc_nhanes.png) | ![](outputs/figures/nhanes/calibration_nhanes.png) | ![](outputs/figures/nhanes/threshold_nhanes.png) |
+| ROC | Calibration | Precision/Recall theo ngưỡng | Decision Curve (net benefit) |
+|---|---|---|---|
+| ![](outputs/figures/nhanes/roc_nhanes.png) | ![](outputs/figures/nhanes/calibration_nhanes.png) | ![](outputs/figures/nhanes/threshold_nhanes.png) | ![](outputs/figures/nhanes/decision_curve_nhanes.png) |
 
 **Giải thích SHAP** — toàn cục & từng cá nhân (an ninh lương thực, việc làm đẩy rủi ro)
 

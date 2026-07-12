@@ -105,6 +105,48 @@ def save_threshold_curve(y_true, proba, title, path, marks=None):
     fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
 
 
+def decision_curve_points(y_true, proba, thresholds=None) -> pd.DataFrame:
+    """Net benefit theo ngưỡng quyết định pt (Decision Curve Analysis, Vickers & Elkin 2006):
+    net_benefit(pt) = TP/n - FP/n * pt/(1-pt). So với "sàng lọc tất cả" (net benefit của việc
+    gắn cờ mọi người) và "không sàng lọc ai" (net benefit = 0, đường mốc)."""
+    y_true = np.asarray(y_true)
+    proba = np.asarray(proba)
+    n = len(y_true)
+    prevalence = y_true.mean()
+    if thresholds is None:
+        thresholds = np.linspace(0.01, 0.99, 99)
+    rows = []
+    for pt in thresholds:
+        pred = (proba >= pt).astype(int)
+        tp = int(((pred == 1) & (y_true == 1)).sum())
+        fp = int(((pred == 1) & (y_true == 0)).sum())
+        w = pt / (1 - pt)
+        rows.append({
+            "threshold": pt,
+            "net_benefit_model": tp / n - fp / n * w,
+            "net_benefit_treat_all": prevalence - (1 - prevalence) * w,
+        })
+    return pd.DataFrame(rows)
+
+
+def save_decision_curve(y_true, proba, title, path, thresholds=None):
+    """Vẽ Decision Curve Analysis: mô hình có ích lâm sàng hơn "gắn cờ tất cả"/"không gắn cờ ai"
+    không, ở mỗi ngưỡng xác suất quyết định — đo giá trị lâm sàng, không chỉ độ phân biệt (AUC)."""
+    dcp = decision_curve_points(y_true, proba, thresholds)
+    fig, ax = plt.subplots(figsize=(7, 5.5))
+    ax.plot(dcp["threshold"], dcp["net_benefit_model"], lw=2.2, color="#3b6ea5", label="Mô hình")
+    ax.plot(dcp["threshold"], dcp["net_benefit_treat_all"], lw=1.5, ls="--",
+            color="#c0504d", label="Sàng lọc tất cả")
+    ax.axhline(0, lw=1.5, ls="--", color="grey", label="Không sàng lọc ai")
+    # Vùng nhìn chuẩn cho DCA: zoom quanh 0 — "sàng lọc tất cả" giảm rất nhanh và không còn
+    # ý nghĩa lâm sàng ở ngưỡng cao, nên không để nó kéo giãn trục Y làm mất phần đáng đọc.
+    ymax = max(dcp["net_benefit_model"].max(), dcp["net_benefit_treat_all"].max(), 0)
+    ax.set_ylim(-0.02, ymax * 1.15 if ymax > 0 else 0.05)
+    ax.set_xlabel("Ngưỡng xác suất quyết định (pt)"); ax.set_ylabel("Net benefit")
+    ax.set_title(title); ax.legend(fontsize=9); ax.grid(alpha=0.3)
+    fig.tight_layout(); fig.savefig(path, dpi=130); plt.close(fig)
+
+
 def save_regression_scatter(y_true, y_pred, title, path):
     fig, ax = plt.subplots(figsize=(5.5, 5.5))
     ax.scatter(y_true, y_pred, s=5, alpha=0.15, color="#3b6ea5")

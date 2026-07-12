@@ -57,15 +57,19 @@ def metrics_at(y, proba, thr):
     """Chỉ số SÀNG LỌC đầy đủ tại một ngưỡng (đặc tả như một test sàng lọc)."""
     pred = (proba >= thr).astype(int)
     tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
+    n = tn + fp + fn + tp
     sens = tp / (tp + fn) if tp + fn else 0          # = recall = độ nhạy
     spec = tn / (tn + fp) if tn + fp else 0          # độ đặc hiệu
     ppv = tp / (tp + fp) if tp + fp else 0           # = precision
     npv = tn / (tn + fn) if tn + fn else 0
     lr_plus = sens / (1 - spec) if spec < 1 else float("inf")
     lr_minus = (1 - sens) / spec if spec > 0 else float("inf")
+    # net benefit (Decision Curve Analysis, Vickers & Elkin 2006) tại chính ngưỡng đang dùng
+    net_benefit = tp / n - fp / n * (thr / (1 - thr)) if 0 < thr < 1 else float("nan")
     return {"thr": round(thr, 3), "sens(recall)": round(sens, 3),
             "spec": round(spec, 3), "PPV": round(ppv, 3), "NPV": round(npv, 3),
             "LR+": round(lr_plus, 2), "LR-": round(lr_minus, 2),
+            "net_benefit": round(net_benefit, 4),
             "flag_rate": round(pred.mean(), 3)}
 
 
@@ -119,6 +123,12 @@ def main():
     print(tab.to_string())
     tab.to_csv(C.METRIC_DIR / "nhanes_thresholds.csv")
     print("  + threshold_nhanes.png, nhanes_thresholds.csv")
+
+    # Decision Curve Analysis: mô hình có ích lâm sàng hơn "gắn cờ tất cả"/"không gắn cờ ai"
+    # không, ở MỌI ngưỡng — bổ sung cho AUC/calibration (đo phân biệt/hiệu chỉnh, không đo lợi ích ra quyết định).
+    evaluate.save_decision_curve(y_te.values, p_cal, "Decision Curve — nguy cơ trầm cảm (test)",
+                                 FIG / "decision_curve_nhanes.png")
+    print("  + decision_curve_nhanes.png")
 
     joblib.dump({"model": cal, "thresholds": marks, "best_name": best_name},
                 C.MODEL_DIR / "model_nhanes_calibrated.joblib", compress=3)

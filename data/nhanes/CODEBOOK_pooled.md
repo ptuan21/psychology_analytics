@@ -7,7 +7,7 @@ Tạo lại bằng: `bash scripts/fetch_nhanes.sh && python scripts/build_nhanes
 **Nguồn gốc & giấy phép:** NHANES là dữ liệu **công khai (public domain)** của chính phủ
 Mỹ (NCHS/CDC). File `.xpt` gốc tải từ `wwwn.cdc.gov`. Có thể dùng lại tự do cho nghiên cứu.
 
-> ⚠️ Muốn ước lượng **đại diện dân số** phải dùng cột `weight` (+ `psu`, `strata`).
+> Muốn ước lượng **đại diện dân số** phải dùng cột `weight` (+ `psu`, `strata`).
 > Trầm cảm đo bằng PHQ-9 (sàng lọc, không phải chẩn đoán). Học vấn chỉ hỏi người ≥20 tuổi.
 > 2019–2020 thiếu (gộp do gián đoạn COVID).
 

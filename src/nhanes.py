@@ -23,6 +23,11 @@ RAW = C.DATA_DIR / "nhanes" / "raw"
 POOLED = C.DATA_DIR / "nhanes" / "nhanes_pooled.csv"
 
 # suffix -> (năm bắt đầu, nhãn chu kỳ)
+# Lưu ý PHƯƠNG PHÁP LUẬN cho "L": đây KHÔNG phải chu kỳ 2 năm chuẩn như các chu kỳ khác — CDC
+# gộp dữ liệu thu thập 2021-2023 (thay cho 2019-2020 bị gián đoạn vì COVID) thành một pseudo-cycle
+# 3 năm với trọng số/thiết kế mẫu riêng. CDC khuyến cáo không so sánh trực tiếp xu hướng của "L"
+# với các chu kỳ 2 năm trước mà không có caveat. Xem sensitivity analysis loại trừ "L" ở
+# scripts/analyze_nhanes_trends.py (sensitivity_exclude_cycle_l) -> outputs/metrics/nhanes_summary.txt.
 CYCLES = {
     "E": (2007, "2007-2008"), "F": (2009, "2009-2010"), "G": (2011, "2011-2012"),
     "H": (2013, "2013-2014"), "I": (2015, "2015-2016"), "J": (2017, "2017-2018"),

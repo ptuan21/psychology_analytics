@@ -166,6 +166,41 @@ def plot_modifiable(adults):
     _save(fig, "modifiable_factors.png")
 
 
+def sensitivity_exclude_cycle_l(adults, edu_adults, lines):
+    """Kiểm tra độ nhạy phương pháp luận: chu kỳ '2021-2023' (suffix L) là pseudo-cycle CDC
+    gộp 3 năm (thay 2019-2020 bị gián đoạn vì COVID), không phải chu kỳ 2 năm chuẩn như các
+    chu kỳ khác -> so sánh xu hướng trực tiếp với nó cần thận trọng (xem CYCLES trong
+    src/nhanes.py). Ở đây lặp lại 2 kết luận chính, thay '2021-2023' bằng chu kỳ 2 năm chuẩn
+    gần nhất (2017-2018), để xem kết luận có đổi không khi bỏ pseudo-cycle."""
+    excl, last_normal, first = "2021-2023", "2017-2018", "2007-2008"
+    lines.append(f"\n=== SENSITIVITY: loại trừ chu kỳ pseudo {excl} (xem caveat CDC trong src/nhanes.py) ===")
+
+    overall_first = wprev(adults[adults["cycle"] == first])
+    overall_last_normal = wprev(adults[adults["cycle"] == last_normal])
+    overall_excl = wprev(adults[adults["cycle"] == excl])
+    lines.append(
+        f"Tỉ lệ chung: {overall_first:.1f}% ({first}) -> {overall_last_normal:.1f}% "
+        f"({last_normal}, chu kỳ 2 năm chuẩn gần nhất) -> {overall_excl:.1f}% ({excl}, pseudo-cycle)")
+
+    def top_group(df, col, order, last_cycle):
+        a = wprev_by(df[df.cycle == first], col, order)
+        b = wprev_by(df[df.cycle == last_cycle], col, order)
+        d = b - a
+        return d.idxmax(), d[d.idxmax()]
+
+    for col, order, df, label in [
+        ("age_group", AGE_ORDER, adults, "nhóm tuổi"),
+        ("education_label", EDU_ORDER, edu_adults, "bậc học"),
+    ]:
+        g_excl, d_excl = top_group(df, col, order, excl)
+        g_normal, d_normal = top_group(df, col, order, last_normal)
+        consistent = g_excl == g_normal
+        lines.append(
+            f"  Nhóm tăng nhanh nhất theo {label}: dùng {excl} -> '{g_excl}' (+{d_excl:.1f}); "
+            f"dùng {last_normal} (loại pseudo-cycle) -> '{g_normal}' (+{d_normal:.1f}) "
+            f"— {'NHẤT QUÁN' if consistent else 'ĐỔI KẾT LUẬN, cần đọc thận trọng'}")
+
+
 def main():
     df = nhanes.load_pooled()
     adults = df[(df["age"] >= 18) & df["dep_risk"].notna()].copy()
@@ -184,6 +219,7 @@ def main():
     plot_heatmap_age_edu(edu_adults)
     plot_delta(edu_adults, lines)
     plot_modifiable(adults)
+    sensitivity_exclude_cycle_l(adults, edu_adults, lines)
 
     (C.METRIC_DIR / "nhanes_summary.txt").write_text("\n".join(lines))
     print(f"\nSố liệu chính -> outputs/metrics/nhanes_summary.txt")

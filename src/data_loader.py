@@ -5,6 +5,7 @@ Các bước làm sạch (đều bật/tắt được qua tham số):
   1. Loại người tích vào "từ giả" trong VCL (trả lời thiếu trung thực).
   2. Loại tuổi phi lý (ngoài [AGE_MIN, AGE_MAX]).
   3. Đưa các giá trị 0 = "thiếu" về NaN (TIPI và một số cột nhân khẩu).
+  4. Đưa familysize=0 về NaN và cắt ngoại lai ở 20.
 """
 import numpy as np
 import pandas as pd

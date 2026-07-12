@@ -311,6 +311,8 @@ quyết định — đánh đổi với số người phải theo dõi (test: 71
 **Xu hướng trầm cảm theo thời gian × tuổi × bậc học** (NHANES, có trọng số)
 
 Người trẻ 18–25 tăng từ ~7% → **19.8%**; nhóm ≥50 gần như không đổi.
+*(chu kỳ cuối 2021-2023 là pseudo-cycle CDC gộp do COVID — sensitivity check ở mục Giới hạn
+cho thấy mức tăng còn ~1/4 nếu bỏ chu kỳ này, dù hướng kết luận không đổi.)*
 
 ![Xu hướng theo nhóm tuổi](outputs/figures/nhanes/trend_by_age.png)
 
@@ -355,6 +357,14 @@ Ngủ <6h (OR 2.53), sức khỏe kém (2.23), nữ (1.80), hút thuốc (1.68).
   (đúng thiết kế NHANES), nên CI rộng & trung thực, không còn xấp xỉ hẹp. Mọi phát hiện
   chính vẫn có ý nghĩa thống kê dưới CI nghiêm ngặt này.
 - Học vấn chỉ hỏi người ≥20; thiếu 2019–2020 (COVID).
+- **Chu kỳ "2021-2023" không phải chu kỳ 2 năm chuẩn** — CDC gộp 3 năm thu thập (thay cho
+  2019-2020 bị gián đoạn) thành một pseudo-cycle riêng, khuyến cáo thận trọng khi so trực tiếp
+  xu hướng với các chu kỳ trước. **Sensitivity check** (loại bỏ chu kỳ này, dùng 2017-2018 làm
+  điểm cuối) cho thấy **hướng kết luận không đổi** (18-25 tuổi & nhóm "Some college" vẫn tăng
+  nhanh nhất) nhưng **độ lớn giảm mạnh** — vd tăng ở 18-25 tuổi chỉ còn **+3.2 điểm %** (so với
+  +12.5 khi tính cả pseudo-cycle) — một phần đáng kể của mức tăng "kịch tính" đến từ đặc thù
+  lấy mẫu/gián đoạn COVID, không chỉ xu hướng nền. Xem đầy đủ ở phần `SENSITIVITY` trong
+  `outputs/metrics/nhanes_summary.txt` (tạo bởi `scripts/analyze_nhanes_trends.py`).
 - File `.xpt` thô bị `.gitignore` (tải lại bằng `fetch_nhanes.sh`); giữ `nhanes_pooled.csv`.
 
 ---

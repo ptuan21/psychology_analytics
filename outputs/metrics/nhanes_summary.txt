@@ -20,3 +20,8 @@ Thay đổi 2007-2008 -> 2021-2023 (Theo bậc học):
   HS/GED         10.1% -> 14.3%  (Δ +4.3)
   Some college   7.1% -> 13.6%  (Δ +6.5)
   College grad   3.3% -> 8.4%  (Δ +5.1)
+
+=== SENSITIVITY: loại trừ chu kỳ pseudo 2021-2023 (xem caveat CDC trong src/nhanes.py) ===
+Tỉ lệ chung: 8.1% (2007-2008) -> 8.5% (2017-2018, chu kỳ 2 năm chuẩn gần nhất) -> 12.6% (2021-2023, pseudo-cycle)
+  Nhóm tăng nhanh nhất theo nhóm tuổi: dùng 2021-2023 -> '18-25' (+13.8); dùng 2017-2018 (loại pseudo-cycle) -> '18-25' (+3.2) — NHẤT QUÁN
+  Nhóm tăng nhanh nhất theo bậc học: dùng 2021-2023 -> 'Some college' (+6.5); dùng 2017-2018 (loại pseudo-cycle) -> 'Some college' (+2.9) — NHẤT QUÁN
